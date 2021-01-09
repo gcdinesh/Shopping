@@ -1,0 +1,14 @@
+# Spring properties
+spring:
+  application:
+    name: account-service
+
+# Discovery Server Access - uncomment this section to use eureka service discovery and also in pom uncomment the dependencies
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://127.0.0.1:8888/eureka/
+
+# HTTP Server
+server:
+  port: 8889   # HTTP (Tomcat) port
