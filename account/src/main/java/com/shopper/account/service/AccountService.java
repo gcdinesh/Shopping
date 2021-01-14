@@ -1,48 +1,70 @@
 package com.shopper.account.service;
 
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
+import com.shopper.account.Validator;
+import com.shopper.account.db.LoginDB;
 import com.shopper.account.exceptions.InvalidPasswordException;
+import com.shopper.account.exceptions.Messages;
 import com.shopper.account.exceptions.UserNotFoundException;
 import com.shopper.account.model.LoginRequestBody;
+import com.shopper.account.model.SignUpRequestBody;
+import com.shopper.account.model.UserDetailsDAO;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
 
-    private final MongoClient mongoClient;
-    private final MongoOperations mongoOperations;
+    private final Validator validator;
+    private final LoginDB loginDB;
 
     @Autowired
-    AccountService(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
-        this.mongoOperations = new MongoTemplate(mongoClient, "login_db");
+    AccountService(Validator validator, LoginDB loginDB) {
+        this.validator = validator;
+        this.loginDB = loginDB;
     }
 
     public String login(final LoginRequestBody loginRequestBody) {
-        FindIterable<Document> result = mongoOperations.getCollection("userDetails")
-                .find(Filters.eq("userName", loginRequestBody.getUserName()), Document.class);
-        MongoCursor<Document> resultItr = result.iterator();
+        MongoCursor<Document> documentCursor = getUserDetails(loginRequestBody.getUserName());
 
-        if(!resultItr.hasNext()) {
-            throw new UserNotFoundException("User {0} not found", loginRequestBody.getUserName());
+        if(!documentCursor.hasNext()) {
+            throw new UserNotFoundException(Messages.USER_NOT_FOUND, loginRequestBody.getUserName());
         }
 
-        Document userDetail = resultItr.next();
+        Document userDetail = documentCursor.next();
         if(loginRequestBody.getPassword().equals(userDetail.get("password"))) {
             return "Login Successful";
         }
 
         throw new InvalidPasswordException();
+    }
+
+    public String signUp(final SignUpRequestBody signUpRequestBody) {
+        validator.validateUserDetails(signUpRequestBody);
+        MongoCursor<Document> documentCursor = getUserDetails(signUpRequestBody.getUserName());
+
+        if(documentCursor.hasNext()) {
+            throw new UserNotFoundException(Messages.USER_ALREADY_EXISTS, signUpRequestBody.getUserName());
+        }
+
+        UserDetailsDAO userDetails = UserDetailsDAO.builder().emailId(signUpRequestBody.getEmailId())
+                .password(signUpRequestBody.getPassword())
+                .userName(signUpRequestBody.getUserName())
+                .build();
+
+        loginDB.insert(userDetails, LoginDB.USER_DETAILS_COLLECTION);
+        return "Sign Up Successful";
+    }
+
+    private MongoCursor<Document> getUserDetails(final String userName) {
+        Bson filter = Filters.eq("userName", userName);
+        return loginDB.find(filter, LoginDB.USER_DETAILS_COLLECTION);
     }
 
 }

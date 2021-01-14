@@ -9,5 +9,6 @@ Pre-requisites:
             - insert sample record: {
                                        "userName" : "testuser",
                                        "password" : "1234678",
+                                       "emailId"  : "gcd@gmail.com"
                                        "passwordExpiryDate" : "1710370827000"
                                     }

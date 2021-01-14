@@ -1,8 +1,12 @@
 package com.shopper.account.exceptions;
 
-import lombok.AllArgsConstructor;
+public class InvalidUserDetailsException extends AccountServiceException {
 
-@AllArgsConstructor
-public class InvalidUserDetailsException extends AccountServiceException{
-    private String userName;
+    public InvalidUserDetailsException(String message, Object...args) {
+        super(message, args);
+    }
+
+    public ErrorDetail getErrorDetail() {
+        return new ErrorDetail(Messages.code3, userMessage);
+    }
 }
