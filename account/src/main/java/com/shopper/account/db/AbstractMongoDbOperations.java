@@ -35,7 +35,7 @@ public abstract class AbstractMongoDbOperations {
             LOGGER.error("Exception while inserting record in mongodb", e);
             throw new MongoInsertionException();
         } catch (MongoException e) {
-            LOGGER.error("Exception while contacting mongodb fo rec", e);
+            LOGGER.error("Exception while contacting mongodb", e);
             throw new MongoInsertionException();
         }
     }
