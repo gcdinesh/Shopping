@@ -1,8 +1,10 @@
 package com.shopper.account.model;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class UserDetailsDAO extends DBDAO{
     private String userName;
     private String password;
