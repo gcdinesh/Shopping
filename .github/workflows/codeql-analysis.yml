@@ -60,6 +60,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
+       cd account
        mvn clean install
 
     - name: Perform CodeQL Analysis
