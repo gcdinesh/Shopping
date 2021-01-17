@@ -58,13 +58,13 @@ public class AccountService {
                 .userName(signUpRequestBody.getUserName())
                 .build();
 
-        loginDB.insert(userDetails, LoginDB.USER_DETAILS_COLLECTION);
+        loginDB.insert(userDetails);
         return "Sign Up Successful";
     }
 
     private MongoCursor<Document> getUserDetails(final String userName) {
         Bson filter = Filters.eq("userName", userName);
-        return loginDB.find(filter, LoginDB.USER_DETAILS_COLLECTION);
+        return loginDB.find(filter);
     }
 
 }
