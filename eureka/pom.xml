@@ -12,7 +12,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <spring.boot.version>2.4.1</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <spring.eureka.version>3.0.0</spring.eureka.version>
 
         <!--non - spring jars-->
